@@ -66,152 +66,125 @@ function SocialMediaUserEnrichment() {
   };
 
   return (
-    <>
-      <div
-        className="relative flex size-full min-h-[70vh] flex-col bg-slate-50 overflow-x-hidden"
-        style={{ fontFamily: "Inter, 'Noto Sans', sans-serif" }}
-      >
-        <div className="layout-container flex h-full grow flex-col">
-          <div className="px-40 flex flex-1 justify-center py-5">
-            <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-              <div className="flex flex-wrap justify-between gap-3 p-4">
-                <p className="text-[#0d141c] tracking-light text-[32px] font-bold leading-tight min-w-72">
-                  Social Media User Enrichment
-                </p>
-              </div>
-              <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-                <label className="flex flex-col min-w-40 flex-1">
-                  <input
-                    id="username"
-                    placeholder="Please enter a username"
-                    className="form-input w-full flex-1 resize-none overflow-hidden rounded-xl text-[#0d141c] focus:outline-0 focus:ring-0 border-none bg-[#e7edf4] h-14 placeholder:text-[#49719c] p-4 text-base font-normal"
-                  />
-                </label>
-              </div>
-              <div className="flex px-4 py-3 justify-end">
-                <button
-                  onClick={socialMediaOSintRequest}
-                  disabled={isLoading}
-                  className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#0d7cf2] text-slate-50 text-sm font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Searching...</span>
-                    </div>
-                  ) : (
-                    <span className="truncate">Search</span>
-                  )}
-                </button>
-              </div>
-              {errorMessage && (
-                <div className="px-4 py-2 mx-4 mb-2 bg-red-100 border border-red-400 text-red-700 rounded">
-                  {errorMessage}
-                </div>
-              )}
-              {isLoading && (
-                <div className="flex flex-col items-center justify-center py-8 px-4">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0d7cf2] mb-4"></div>
-                  <p className="text-[#49719c] text-base">Searching for details...</p>
-                </div>
-              )}
-              {!isLoading && searchResultsInstagram.length === 0 && searchResultsTwitter.length === 0 && !errorMessage && (
-                <div className="px-4 py-3 text-[#49719c] text-sm">No results found. Enter a username to search.</div>
-              )}
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-28 pb-20 overflow-x-hidden" style={{ fontFamily: "Inter, 'Noto Sans', sans-serif" }}>
+      <div className="relative max-w-6xl mx-auto px-6">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full mb-6">
+            <span className="text-sm font-semibold text-white">Social Media OSINT</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
+            User
+            <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent neon-text">
+              Enrichment
+            </span>
+          </h1>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">Lookup usernames across Instagram and Twitter to reveal public profile details</p>
+        </div>
 
-              <div className="px-4 py-3 w-[80vw] lg:w-auto @container">
-                <h3 className="text-[#0d141c] tracking-light text-[20px] font-bold leading-tight min-w-50 m-[1rem]">
-                  Instagram
-                </h3>
-                <div className="flex overflow-scroll rounded-xl border border-[#cedbe8] bg-slate-50">
-                  <table className="flex-1">
-                    <thead>
-                      <tr className="bg-slate-50">
-                        <th className="px-4 py-3 text-left text-[#0d141c] w-[200px] text-sm font-medium">
-                          Profile Picture
-                        </th>
-                        <th className="px-4 py-3 text-left text-[#0d141c] w-[200px] text-sm font-medium">
-                          Username
-                        </th>
-                        <th className="px-4 py-3 text-left text-[#0d141c] w-[200px] text-sm font-medium">
-                          Full Name
-                        </th>
-                        <th className="px-4 py-3 text-left text-[#0d141c] w-[200px] text-sm font-medium">
-                          Followers
-                        </th>
-                        <th className="px-4 py-3 text-left text-[#0d141c] w-[200px] text-sm font-medium">
-                          Bio
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {!isLoading && searchResultsInstagram.map((row, index) => (
-                        <tr key={index} className="border-t border-[#cedbe8]">
-                          <td className="h-[72px] px-4 py-2 w-[200px] text-[#0d141c] text-sm font-normal">
-                            <a
-                              href={row.profile_pic_url_hd || "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 underline"
-                            >
-                              {row.profile_pic_url_hd ? "Profile Pic" : "N/A"}
-                            </a>
-                          </td>
-                          <td className="h-[72px] px-4 py-2 w-[200px] text-[#0d141c] text-sm font-normal">
-                            {row.username || "N/A"}
-                          </td>
-                          <td className="h-[72px] px-4 py-2 w-[200px] text-[#0d141c] text-sm font-normal">
-                            {row.full_name || "N/A"}
-                          </td>
-                          <td className="h-[72px] px-4 py-2 w-[200px] text-[#0d141c] text-sm font-normal">
-                            {row.followers || "N/A"}
-                          </td>
-                          <td className="h-[72px] px-4 py-2 w-[200px] text-[#0d141c] text-sm font-normal">
-                            {row.bio || "N/A"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+        <div className="glass rounded-2xl p-6 md:p-8 mb-8">
+          <div className="flex flex-col md:flex-row gap-4 items-end">
+            <label className="flex flex-col flex-1">
+              <input
+                id="username"
+                placeholder="Enter a username (e.g. johndoe)"
+                className="futuristic-input w-full flex-1 resize-none overflow-hidden rounded-xl text-white h-14 placeholder:text-gray-400 p-4 text-base"
+              />
+            </label>
+            <button
+              onClick={socialMediaOSintRequest}
+              disabled={isLoading}
+              className="btn-modern flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold disabled:bg-gray-600 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Searching...</span>
                 </div>
-              </div>
+              ) : (
+                <span className="truncate">Search</span>
+              )}
+            </button>
+          </div>
 
-              <div className="px-4 py-3 w-[80vw] lg:w-auto @container">
-                <h3 className="text-[#0d141c] tracking-light text-[20px] font-bold leading-tight min-w-50 m-[1rem]">
-                  Twitter
-                </h3>
-                <div className="flex overflow-scroll rounded-xl border border-[#cedbe8] bg-slate-50">
-                  <table className="flex-1">
-                    <thead>
-                      <tr className="bg-slate-50">
-                        <th className="px-4 py-3 text-left text-[#0d141c] w-[200px] text-sm font-medium">ID</th>
-                        <th className="px-4 py-3 text-left text-[#0d141c] w-[200px] text-sm font-medium">Created At</th>
-                        <th className="px-4 py-3 text-left text-[#0d141c] w-[200px] text-sm font-medium">Professional Type</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {!isLoading && searchResultsTwitter.map((row, index) => (
-                        <tr key={index} className="border-t border-[#cedbe8]">
-                          <td className="h-[72px] px-4 py-2 w-[200px] text-[#0d141c] text-sm font-normal">
-                            {row.id || "N/A"}
-                          </td>
-                          <td className="h-[72px] px-4 py-2 w-[200px] text-[#0d141c] text-sm font-normal">
-                            {row.legacy?.created_at || "N/A"}
-                          </td>
-                          <td className="h-[72px] px-4 py-2 w-[200px] text-[#0d141c] text-sm font-normal">
-                            {row.professional?.professional_type || "N/A"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          {errorMessage && (
+            <div className="px-4 py-2 mt-4 bg-red-500/20 border border-red-400 text-red-300 rounded">
+              {errorMessage}
             </div>
+          )}
+
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-8 px-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mb-4"></div>
+              <p className="text-gray-300 text-base">Searching for details...</p>
+            </div>
+          )}
+
+          {!isLoading && searchResultsInstagram.length === 0 && searchResultsTwitter.length === 0 && !errorMessage && (
+            <div className="px-4 py-3 text-gray-300 text-sm">No results found. Enter a username to search.</div>
+          )}
+        </div>
+
+        <div className="@container">
+          <div className="glass rounded-2xl overflow-hidden mb-8">
+            <div className="flex items-center justify-between px-4 py-3">
+              <h3 className="text-xl font-bold text-white">Instagram</h3>
+            </div>
+            <table className="min-w-full">
+              <thead>
+                <tr>
+                  <th className="px-4 py-3 text-left text-white text-sm font-semibold">Profile Picture</th>
+                  <th className="px-4 py-3 text-left text-white text-sm font-semibold">Username</th>
+                  <th className="px-4 py-3 text-left text-white text-sm font-semibold">Full Name</th>
+                  <th className="px-4 py-3 text-left text-white text-sm font-semibold">Followers</th>
+                  <th className="px-4 py-3 text-left text-white text-sm font-semibold">Bio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {!isLoading && searchResultsInstagram.map((row, index) => (
+                  <tr key={index} className="border-t border-white/10">
+                    <td className="h-[72px] px-4 py-2 text-gray-200 text-sm">
+                      {row.profile_pic_url_hd ? (
+                        <a href={row.profile_pic_url_hd} target="_blank" rel="noopener noreferrer" className="text-purple-300 hover:text-pink-300 underline">Profile Pic</a>
+                      ) : (
+                        <span className="text-gray-400">N/A</span>
+                      )}
+                    </td>
+                    <td className="h-[72px] px-4 py-2 text-gray-200 text-sm">{row.username || "N/A"}</td>
+                    <td className="h-[72px] px-4 py-2 text-gray-200 text-sm">{row.full_name || "N/A"}</td>
+                    <td className="h-[72px] px-4 py-2 text-gray-200 text-sm">{row.followers || "N/A"}</td>
+                    <td className="h-[72px] px-4 py-2 text-gray-200 text-sm">{row.bio || "N/A"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="glass rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3">
+              <h3 className="text-xl font-bold text-white">Twitter</h3>
+            </div>
+            <table className="min-w-full">
+              <thead>
+                <tr>
+                  <th className="px-4 py-3 text-left text-white text-sm font-semibold">ID</th>
+                  <th className="px-4 py-3 text-left text-white text-sm font-semibold">Created At</th>
+                  <th className="px-4 py-3 text-left text-white text-sm font-semibold">Professional Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {!isLoading && searchResultsTwitter.map((row, index) => (
+                  <tr key={index} className="border-t border-white/10">
+                    <td className="h-[72px] px-4 py-2 text-gray-200 text-sm">{row.id || "N/A"}</td>
+                    <td className="h-[72px] px-4 py-2 text-gray-200 text-sm">{row.legacy?.created_at || "N/A"}</td>
+                    <td className="h-[72px] px-4 py-2 text-gray-200 text-sm">{row.professional?.professional_type || "N/A"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

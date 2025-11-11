@@ -7,6 +7,7 @@ import {
 } from "@stripe/react-stripe-js";
 import Cookies from "js-cookie";
 
+// ✅ Stripe public key
 const stripePromise = loadStripe(
   "pk_test_51PosA3H35XY8u0JzOYqafQzcmDFPIRl2cWXDIyAjyy8GnIuHSrpSVnHbhwgXWKfPqcRcgkWVosp4PxtYXDiYS5Lp00ZUWcBz4P"
 );
@@ -15,38 +16,46 @@ const CheckoutForm = () => {
   const location = useLocation();
   const { amount } = location.state || { amount: 0 };
 
+  // ✅ Use your original working backend route
   const fetchClientSecret = useCallback(() => {
-    const backendUrl = `http://${import.meta.env.VITE_BACKEND_IP || 'localhost'}:${import.meta.env.VITE_BACKEND_PORT || '4002'}`;
-    return fetch(
-      `${backendUrl}/api/payment/create-checkout-session`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount,
-        }),
-      }
-    )
+    const backendUrl = `http://${
+      import.meta.env.VITE_BACKEND_IP || "localhost"
+    }:${import.meta.env.VITE_BACKEND_PORT || "4002"}`;
+
+    return fetch(`${backendUrl}/api/payment/create-checkout-session`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ amount }),
+    })
       .then((res) => res.json())
       .then((data) => data.clientSecret)
-      .catch(() => {
-        return null;
-      });
+      .catch(() => null);
   }, [amount]);
 
   const options = { fetchClientSecret };
 
   return (
-    <div id="checkout" style={{ width: "100vw", height: "60vh" }}>
-      <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
-        <EmbeddedCheckout />
-      </EmbeddedCheckoutProvider>
+    <div
+      className="flex justify-center items-center w-full px-4 md:px-0"
+    >
+      <div
+        id="checkout"
+        className="
+                   bg-gradient-to-br from-[#15002c]/60 to-[#2e0057]/40 
+                   rounded-2xl shadow-2xl border border-white/10 backdrop-blur-lg p-6
+                   flex justify-center items-center"
+      >
+        <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
+          <EmbeddedCheckout />
+        </EmbeddedCheckoutProvider>
+      </div>
     </div>
   );
 };
 
+// ✅ Success / Return Page
 const Return = () => {
   const [status, setStatus] = useState(null);
   const [customerEmail, setCustomerEmail] = useState("");
@@ -54,12 +63,13 @@ const Return = () => {
 
   useEffect(() => {
     const fetchSessionStatus = async () => {
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
+      const urlParams = new URLSearchParams(window.location.search);
       const sessionId = urlParams.get("session_id");
 
       try {
-        const backendUrl = `http://${import.meta.env.VITE_BACKEND_IP || 'localhost'}:${import.meta.env.VITE_BACKEND_PORT || '4002'}`;
+        const backendUrl = `http://${
+          import.meta.env.VITE_BACKEND_IP || "localhost"
+        }:${import.meta.env.VITE_BACKEND_PORT || "4002"}`;
         const response = await fetch(
           `${backendUrl}/api/payment/session-status?session_id=${sessionId}`
         );
@@ -72,8 +82,9 @@ const Return = () => {
           await addWalletBalance(data.amount);
           setHasAddedBalance(true);
         }
-              } catch (error) {
-              }
+      } catch (error) {
+        console.error("Error fetching session:", error);
+      }
     };
 
     fetchSessionStatus();
@@ -87,32 +98,52 @@ const Return = () => {
     return (
       <section
         id="success"
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#ffffff",
-          flexDirection: "column",
-          width: "100%",
-          height: "50vh",
-          borderRadius: "6px",
-          padding: "20px",
-          boxSizing: "border-box",
-          textAlign: "center",
-        }}
+        className="relative flex flex-col justify-center items-center  text-center
+                   bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]
+                   rounded-3xl shadow-2xl p-8 overflow-hidden"
       >
-        <p
-          style={{
-            fontWeight: "500",
-            fontSize: "14px",
-            lineHeight: "20px",
-            color: "#242d60",
-          }}
-        >
-          We appreciate your business! A confirmation email will be sent to{" "}
-          {customerEmail}. If you have any questions, please email{" "}
-          <a href="mailto:orders@example.com">orders@example.com</a>.
+        {/* Floating particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(8)].map((_, i) => (
+            <span
+              key={i}
+              className="absolute bg-white/10 rounded-full animate-pulse"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                width: `${10 + Math.random() * 20}px`,
+                height: `${10 + Math.random() * 20}px`,
+                animationDelay: `${Math.random() * 5}s`,
+              }}
+            ></span>
+          ))}
+        </div>
+
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 z-10">
+          Payment Successful 💫
+        </h2>
+
+        <p className="text-white/80 text-sm md:text-base font-medium max-w-lg z-10">
+          We appreciate your business! A confirmation email has been sent to{" "}
+          <span className="text-[#00c6ff] font-semibold">{customerEmail}</span>.
+          <br />
+          If you have any questions, email{" "}
+          <a
+            href="mailto:orders@example.com"
+            className="text-[#ff9ff3] hover:text-[#f368e0] underline transition"
+          >
+            orders@example.com
+          </a>
+          .
         </p>
+
+        <button
+          onClick={() => (window.location.href = "/dashboard")}
+          className="mt-8 px-6 py-3 text-white font-semibold rounded-xl
+                     bg-gradient-to-r from-[#667eea] to-[#764ba2] hover:opacity-90 transition z-10"
+        >
+          Go to Dashboard
+        </button>
       </section>
     );
   }
@@ -120,31 +151,27 @@ const Return = () => {
   return null;
 };
 
+// ✅ Add Wallet Balance helper
 async function addWalletBalance(amount) {
   try {
-    if (!amount) {
-      throw new Error("Amount is invalid.");
-    }
-    const backendUrl = `http://${import.meta.env.VITE_BACKEND_IP || 'localhost'}:${import.meta.env.VITE_BACKEND_PORT || '4002'}`;
-    const response = await fetch(
-      `${backendUrl}/api/user/wallet`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: Cookies.get("usertoken"),
-        },
-        body: JSON.stringify({
-          amount: amount.toString(),
-        }),
-      }
-    );
+    if (!amount) throw new Error("Amount invalid.");
+    const backendUrl = `http://${
+      import.meta.env.VITE_BACKEND_IP || "localhost"
+    }:${import.meta.env.VITE_BACKEND_PORT || "4002"}`;
+    const response = await fetch(`${backendUrl}/api/user/wallet`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: Cookies.get("usertoken"),
+      },
+      body: JSON.stringify({ amount: amount.toString() }),
+    });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-        } catch (error) {
-        }
+    if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
+  } catch (error) {
+    console.error("Wallet update error:", error);
+  }
 }
 
+// ✅ Export both components
 export { CheckoutForm, Return };

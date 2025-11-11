@@ -10,9 +10,13 @@ function Profilepage() {
     return (
         <>
             <Header />
-            <Profile />
-            <Pricing />
-            <Phoneosintgraphics />
+            <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-28 pb-20 overflow-x-hidden" style={{ fontFamily: "Inter, 'Noto Sans', sans-serif" }}>
+                <div className="max-w-6xl mx-auto px-6">
+                    <Profile />
+                    <Pricing />
+                    <Phoneosintgraphics />
+                </div>
+            </div>
             <Footer />
         </>
     );
