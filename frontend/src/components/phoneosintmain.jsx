@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import Cookies from "js-cookie";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaPhone, FaSearch, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { HiSparkles } from "react-icons/hi";
 
 function Phonesearchcomponent() {
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const PhoneOSintRequest = async () => {
-    const phone = document.getElementById("phone_number").value;
-    
-    if (!phone) {
+    if (!phoneNumber) {
       setErrorMessage("Please enter a phone number");
       return;
     }
@@ -26,7 +28,7 @@ function Phonesearchcomponent() {
     try {
       const backendUrl = `http://${import.meta.env.VITE_BACKEND_IP || 'localhost'}:${import.meta.env.VITE_BACKEND_PORT || '4002'}`;
       const response = await fetch(
-        `${backendUrl}/api/phoneosint/phone?phone=${encodeURIComponent(phone)}`,
+        `${backendUrl}/api/phoneosint/phone?phone=${encodeURIComponent(phoneNumber)}`,
         {
           method: "GET",
           headers: {
@@ -53,103 +55,199 @@ function Phonesearchcomponent() {
   };
 
   return (
-    <div
-      className="relative flex size-full min-h-[70vh] flex-col bg-slate-50 overflow-x-hidden"
-      style={{ fontFamily: "Inter, 'Noto Sans', sans-serif" }}
-    >
-      <div className="layout-container flex h-full grow flex-col">
-        <div className="px-40 flex flex-1 justify-center py-5">
-          <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-            <div className="flex flex-wrap justify-between gap-3 p-4">
-              <p className="text-[#0d141c] tracking-light text-[32px] font-bold leading-tight min-w-72">
-                Phone Number Search
-              </p>
-            </div>
-            <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label className="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="XXXX-XXX-XXXX"
-                  id="phone_number"
-                  className="form-input w-full flex-1 resize-none overflow-hidden rounded-xl text-[#0d141c] focus:outline-0 focus:ring-0 border-none bg-[#e7edf4] h-14 placeholder:text-[#49719c] p-4 text-base font-normal"
-                />
-              </label>
-            </div>
-            <div className="flex px-4 py-3 justify-end">
-              <button 
-                onClick={PhoneOSintRequest} 
-                disabled={isLoading}
-                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#0d7cf2] text-slate-50 text-sm font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Searching...</span>
-                  </div>
-                ) : (
-                  <span className="truncate">Search</span>
-                )}
-              </button>
-            </div>
-            {errorMessage && (
-              <div className="px-4 py-2 mx-4 mb-2 bg-red-100 border border-red-400 text-red-700 rounded">
-                {errorMessage}
-              </div>
-            )}
-            {isLoading && (
-              <div className="flex flex-col items-center justify-center py-8 px-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0d7cf2] mb-4"></div>
-                <p className="text-[#49719c] text-base">Searching for details...</p>
-              </div>
-            )}
-            {!isLoading && searchResults.length === 0 && !errorMessage && (
-              <div className="px-4 py-3 text-[#49719c] text-sm">No results found. Enter a phone number to search.</div>
-            )}
-            <div className="px-4 py-3 w-[80vw] lg:w-auto @container">
-              <div className="flex overflow-scroll rounded-xl border border-[#cedbe8] bg-slate-50">
-                <table className="flex-1">
-                  <thead>
-                    <tr className="bg-slate-50">
-                    <th className="px-4 py-3 text-left text-[#0d141c] w-[400px] text-sm font-medium">Number</th>
-                    <th className="px-4 py-3 text-left text-[#0d141c] w-[400px] text-sm font-medium">Valid</th>
-                    <th className="px-4 py-3 text-left text-[#0d141c] w-[400px] text-sm font-medium">Location</th>
-                      <th className="px-4 py-3 text-left text-[#0d141c] w-[400px] text-sm font-medium">Carrier</th>
-                      <th className="px-4 py-3 text-left text-[#0d141c] w-[400px] text-sm font-medium">Location</th>
-                      <th className="px-4 py-3 text-left text-[#0d141c] w-[400px] text-sm font-medium">Country</th>
-                      <th className="px-4 py-3 text-left text-[#0d141c] w-[400px] text-sm font-medium">Line Type</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {!isLoading && searchResults.map((row, index) => (
-                      <tr key={index} className="border-t border-[#cedbe8]">
-                        <td className="h-[72px] px-4 py-2 w-[400px] text-[#0d141c] text-sm font-normal">
-                          {row.international_format}
-                        </td>
-                        <td className="h-[72px] px-4 py-2 w-[400px] text-[#49719c] text-sm font-normal">
-                        {row.valid ? "Yes" : "No"}
-                        </td>
-                        <td className="h-[72px] px-4 py-2 w-[400px] text-[#49719c] text-sm font-normal">
-                          {row.location}
-                        </td>
-                        <td className="h-[72px] px-4 py-2 w-[400px] text-[#49719c] text-sm font-normal">
-                          {row.carrier}
-                        </td>
-                        <td className="h-[72px] px-4 py-2 w-[400px] text-[#49719c] text-sm font-normal">
-                          {row.location}
-                        </td>
-                        <td className="h-[72px] px-4 py-2 w-[400px] text-[#49719c] text-sm font-normal">
-                          {row.country_name}
-                        </td>
-                        <td className="h-[72px] px-4 py-2 w-[400px] text-[#49719c] text-sm font-normal">
-                          {row.line_type}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-28 pb-20">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+
+      <div className="relative max-w-6xl mx-auto px-6">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full mb-6">
+            <HiSparkles className="w-5 h-5 text-yellow-400" />
+            <span className="text-sm font-semibold text-white">Phone Investigation</span>
           </div>
-        </div>
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
+            Phone Number
+            <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Intelligence Search
+            </span>
+          </h1>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            Validate phone numbers and get location, carrier, and line type information
+          </p>
+        </motion.div>
+
+        {/* Search Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="glass-card rounded-3xl p-8 mb-8"
+        >
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <FaPhone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Enter phone number (e.g., +1-555-123-4567)"
+                value={phoneNumber}
+                onChange={(e) => {
+                  setPhoneNumber(e.target.value);
+                  setErrorMessage("");
+                }}
+                className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-400 focus:bg-white/10 transition-all"
+              />
+            </div>
+            <motion.button
+              onClick={PhoneOSintRequest}
+              disabled={isLoading}
+              whileHover={{ scale: isLoading ? 1 : 1.05 }}
+              whileTap={{ scale: isLoading ? 1 : 0.95 }}
+              className={`btn-modern px-8 py-4 rounded-xl font-bold text-base shadow-lg flex items-center gap-2 ${
+                isLoading
+                  ? 'bg-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-purple-500 to-indigo-600 shadow-purple-500/50'
+              } text-white`}
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Searching...</span>
+                </>
+              ) : (
+                <>
+                  <FaSearch className="w-4 h-4" />
+                  <span>Search</span>
+                </>
+              )}
+            </motion.button>
+          </div>
+
+          {/* Error Message */}
+          <AnimatePresence>
+            {errorMessage && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 p-4 rounded-xl bg-red-500/10 border border-red-500/50 text-red-400 text-sm"
+              >
+                {errorMessage}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Loading State */}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="glass-card rounded-2xl p-12 text-center"
+            >
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent mx-auto mb-6"></div>
+              <p className="text-gray-400 text-lg">Searching for phone details...</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* No Results */}
+        {!isLoading && searchResults.length === 0 && !errorMessage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="glass-card rounded-2xl p-12 text-center"
+          >
+            <FaPhone className="w-16 h-16 text-purple-400 mx-auto mb-4 opacity-50" />
+            <p className="text-gray-400">No results found. Enter a phone number to search.</p>
+          </motion.div>
+        )}
+
+        {/* Results */}
+        <AnimatePresence>
+          {!isLoading && searchResults.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              {searchResults.map((row, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="glass-card rounded-2xl p-6"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Number */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <FaPhone className="w-4 h-4 text-purple-400" />
+                        <span className="text-gray-400 text-sm font-semibold">Phone Number</span>
+                      </div>
+                      <p className="text-white font-bold text-lg">{row.international_format || 'N/A'}</p>
+                    </div>
+
+                    {/* Valid Status */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        {row.valid ? (
+                          <FaCheckCircle className="w-4 h-4 text-green-400" />
+                        ) : (
+                          <FaTimesCircle className="w-4 h-4 text-red-400" />
+                        )}
+                        <span className="text-gray-400 text-sm font-semibold">Validity</span>
+                      </div>
+                      <p className={`font-bold ${row.valid ? 'text-green-400' : 'text-red-400'}`}>
+                        {row.valid ? "Valid" : "Invalid"}
+                      </p>
+                    </div>
+
+                    {/* Location */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-gray-400 text-sm font-semibold">Location</span>
+                      </div>
+                      <p className="text-white">{row.location || 'N/A'}</p>
+                    </div>
+
+                    {/* Carrier */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-gray-400 text-sm font-semibold">Carrier</span>
+                      </div>
+                      <p className="text-white">{row.carrier || 'N/A'}</p>
+                    </div>
+
+                    {/* Country */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-gray-400 text-sm font-semibold">Country</span>
+                      </div>
+                      <p className="text-white">{row.country_name || 'N/A'}</p>
+                    </div>
+
+                    {/* Line Type */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-gray-400 text-sm font-semibold">Line Type</span>
+                      </div>
+                      <p className="text-white">{row.line_type || 'N/A'}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
